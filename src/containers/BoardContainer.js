@@ -28,9 +28,21 @@ const BlackStone = styled.div`
   text-shadow: #101010 1px 1px 5px;
 `
 
+const PassButton = styled.button`
+`
+
 const BoardContainer = (props) => {
   const turnMessage = `It's ${props.turn === 'W' ? 'White' : props.turn === 'B' ? 'Black' : null} trun`
   const score = calcScore(props.board)
+  const passButton = (props.candidates.length === 0 && props.players[props.turn] === 'Human') ?
+        (
+          <PassButton onClick={() => props.dispatch(Actions.uiPass())}>
+            Pass!
+         </PassButton>
+        )
+        :
+        null
+
   const gameStartButton = props.gameRunning ?
         null
         :
@@ -63,6 +75,7 @@ const BoardContainer = (props) => {
             </div>
           </div>
           <div className="row">
+            {passButton}
             {gameStartButton}
           </div>
         </div>

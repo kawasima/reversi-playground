@@ -10,10 +10,10 @@ const Square = styled.div`
   vertical-align: middle;
   border: 1px solid #000000;
   text-align: center;
-  text-shadow: #101010 1px 1px 5px;
+  text-shadow: ${props => props.isCandidate ? 'none' : '#101010 1px 1px 5px'};
   cursor: pointer;
-  color: ${props => props.color}
-  background-color: ${props => props.hover ? '#996699' : '#669966'}
+  color: ${props => props.color};
+  background-color: ${props => props.hover ? '#996699' : '#669966'};
 `
 
 export default class BoardCell extends React.Component {
@@ -24,23 +24,29 @@ export default class BoardCell extends React.Component {
     const props = this.props
     let stone = props.stone !== null ? '●' : null
     let color = props.stone === 'B' ? '#101010' : props.stone === 'W' ? '#ffffff' : 'transparent'
+    const isCandidate = props.candidates.find(({x, y}) => x === props.x && y === props.y)
 
-    if (this.state.hover && props.candidates.find(({x, y}) => x === props.x && y === props.y)) {
+    if (props.gameRunning && isCandidate) {
       stone = '●'
-      color = props.turn === 'B' ? '#101010' : props.turn === 'W' ? '#ffffff' : 'transparent'
+      const opacity = this.state.hover ? 1 : 0.3
+      color = props.turn === 'B' ?
+        `rgba(16, 16, 16, ${opacity})`
+        :
+        props.turn === 'W' ? `rgba(255,255,255, ${opacity})` : 'transparent'
     }
 
-    const createMouseHoverFn = (hover) => props.players[props.turn] === 'Human' ?
+    const createMouseHoverFn = (hover) => props.gameRunning && props.players[props.turn] === 'Human' ?
           () => this.setState({ hover })
           :
           () => {}
 
     return (
       <Square color={color}
+              isCandidate={isCandidate}
               hover={this.state.hover}
               onMouseOut={createMouseHoverFn(false)}
               onMouseOver={createMouseHoverFn(true)}
-              onClick={() => props.dispatch(Actions.dropStone({
+              onClick={() => props.gameRunning && props.dispatch(Actions.dropStone({
                 x: props.x,
                 y: props.y,
                 turn: props.turn

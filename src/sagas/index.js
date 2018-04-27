@@ -2,11 +2,14 @@ import {
   fork,
   select,
   take,
+  takeEvery,
   put,
   race
 } from 'redux-saga/effects'
 import { delay } from 'redux-saga'
 import Actions from '../actions/game-actions'
+import values from 'lodash/values'
+import sum from 'lodash/sum'
 
 export function nextTurn(turn) {
   switch(turn) {
@@ -55,6 +58,7 @@ export function drop(turn, x, y, board) {
 }
 
 export function canDrop(turn, x, y, board) {
+  if (board[y][x]) return false
   for (let [dx, dy] of [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]]) {
     let cx = x + dx, cy = y + dy
     let sandwitched = false
@@ -121,6 +125,10 @@ function* handleComputerTurn(strategy, turn) {
     turn: nextTurn(turn),
     candidates: filterDroppableSquare(nextSituation, nextTurn(turn))
   }))
+  if (sum(values(score(nextSituation))) >= 64) {
+    yield put(Actions.setGameRunning(false))
+  }
+
 }
 
 function* handleDropStone({ x, y, turn }) {
@@ -132,9 +140,27 @@ function* handleDropStone({ x, y, turn }) {
     turn: nextTurn(turn),
     candidates: filterDroppableSquare(nextSituation, nextTurn(turn))
   }))
+  if (sum(values(score(nextSituation)) >= 64)) {
+    yield put(Actions.setGameRunning(false))
+  }
+}
+
+function* handlePass(action) {
+  const { board, turn } = yield select ((s) => {
+    return {
+      board: s.game.board,
+      turn: s.game.turn
+    }
+  })
+  yield put(Actions.nextTurn({
+    board: board,
+    turn: nextTurn(turn),
+    candidates: filterDroppableSquare(board, nextTurn(turn))
+  }))
 }
 
 function* mainGame() {
+  yield takeEvery('UI_PASS', handlePass)
   while(true) {
     const action = yield race({
       human: take('DROP_STONE'),
