@@ -2,6 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 import { connect } from 'react-redux'
 import Board from '../components/Board'
+import EvaluationEditor from '../components/molecules/EvaluationEditor'
 import Actions from '../actions/game-actions'
 
 function calcScore(board) {
@@ -18,13 +19,13 @@ function calcScore(board) {
 
 const WhiteStone = styled.div`
   color: #ffffff;
-  font-size: 30px;
+  font-size: 6vh;
   text-shadow: #101010 1px 1px 5px;
 `
 
 const BlackStone = styled.div`
   color: #101010;
-  font-size: 30px;
+  font-size: 6vh;
   text-shadow: #101010 1px 1px 5px;
 `
 
@@ -53,7 +54,7 @@ const BoardContainer = (props) => {
           </button>
         )
   return (
-    <div className="ui two column grid">
+    <div className="ui two column stackable grid">
       <div className="column">
         <Board {...props}/>
       </div>
@@ -78,6 +79,11 @@ const BoardContainer = (props) => {
             {passButton}
             {gameStartButton}
           </div>
+        </div>
+      </div>
+      <div className="row">
+        <div style={{width: '100%'}}>
+          <EvaluationEditor code="a"/>
         </div>
       </div>
     </div>

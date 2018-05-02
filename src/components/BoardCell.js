@@ -3,9 +3,9 @@ import styled from 'styled-components'
 import Actions from '../actions/game-actions'
 
 const Square = styled.div`
-  font-size: 30px;
-  width: 50px;
-  height: 50px;
+  font-size: 5vh;
+  width: 10vh;
+  height: 10vh;
   line-height: 50px;
   vertical-align: middle;
   border: 1px solid #000000;
